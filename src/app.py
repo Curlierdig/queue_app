@@ -1,14 +1,15 @@
 from flask import Flask, render_template, jsonify, request
 from models.queue_mang import queue
 
-
-
 app = Flask(__name__)
 my_queue = queue() #instanciamos la clase
 
 @app.route("/")
 def home():
-    return render_template("index.html")
+    queue_data = my_queue.showQueue()
+    waitlist_length = my_queue.waitlistLength()
+    waitlist_data = my_queue.getWaitlist()
+    return render_template("index.html", queue=queue_data, waitlistLength=waitlist_length, waitlist=waitlist_data)
 
 @app.route("/queue", methods=["GET"])
 def get_queue():
