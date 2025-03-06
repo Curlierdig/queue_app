@@ -5,32 +5,35 @@ app = Flask(__name__)
 my_queue = queue() #instanciamos la clase
 
 @app.route("/")
-def home():
+def home(): #endpoint para mostrar la cola y la lista de espera
     queue_data = my_queue.showQueue()
     waitlist_length = my_queue.waitlistLength()
-    waitlist_data = my_queue.getWaitlist()
-    return render_template("index.html", queue=queue_data, waitlistLength=waitlist_length, waitlist=waitlist_data)
+    return render_template("index.html", queue=queue_data, waitlistLength=waitlist_length)
 
 @app.route("/queue", methods=["GET"])
-def get_queue():
+def get_queue(): #endpoint para obtener la cola y la lista de espera
     return jsonify({
         "queue": my_queue.showQueue(),
         "waitlist": my_queue.waitlistLength()
     })
 
 @app.route("/join", methods=["POST"])
-def join_queue():
-    user = request.json.get("user")
+def join_queue(): #endooint para agregar un usuario a la cola
+    user = request.form.get("user") 
     message = my_queue.enqueue(user)
-    return jsonify({"message": message})
+    return render_template("index.html", 
+        queue=my_queue.showQueue(),
+        waitlistLength=my_queue.waitlistLength())
 
 @app.route("/remove", methods=["POST"])
-def remove_from_queue():
+def remove_from_queue(): #removemos el primer usuario de la cola
     removed = my_queue.dequeue()
-    return jsonify({"removed": removed})
+    return render_template("index.html",
+        queue=my_queue.showQueue(),
+        waitlistLength=my_queue.waitlistLength())
 
 @app.route("/peek", methods=["GET"])
-def peek_queue():
+def peek_queue(): #obtenemos el siguiente usuario en la cola
     next_in_queue = my_queue.peek()
     return jsonify({"next": next_in_queue})
 
